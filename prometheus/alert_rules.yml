@@ -1,0 +1,47 @@
+groups:
+  - name: feature-flags-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_server_requests_seconds_count{application="feature-flags-api", status=~"5.."}[5m]) / rate(http_server_requests_seconds_count{application="feature-flags-api"}[5m]) * 100 > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }}% for feature-flags-api"
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{application="feature-flags-api"}[5m])) > 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s for feature-flags-api"
+
+      - alert: HighMemoryUsage
+        expr: (jvm_memory_used_bytes{application="feature-flags-api"} / jvm_memory_max_bytes{application="feature-flags-api"}) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}% for feature-flags-api"
+
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total{application="feature-flags-api"}[5m]) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}% for feature-flags-api"
+
+      - alert: DatabaseConnectionPoolExhausted
+        expr: hikaricp_connections_active{application="feature-flags-api"} / hikaricp_connections_max{application="feature-flags-api"} * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "Connection pool usage is {{ $value }}% for feature-flags-api"

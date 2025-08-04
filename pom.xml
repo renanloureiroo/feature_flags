@@ -112,6 +112,26 @@
       <artifactId>opentelemetry-exporter-otlp</artifactId>
       <version>1.39.0</version>
     </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk</artifactId>
+      <version>1.39.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
+      <version>1.39.0-alpha</version>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+      <version>1.39.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-instrumentation-spring-boot-starter</artifactId>
+      <version>1.39.0</version>
+    </dependency>
     
 
 		
