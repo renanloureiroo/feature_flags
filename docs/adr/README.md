@@ -16,11 +16,11 @@ Este diretório contém as decisões arquiteturais importantes do projeto Featur
 **Data:** 2025-08-05  
 **Decisão:** Implementar validação de JSON Schema usando `json-schema-validator` com schemas simples.
 
-### [003 - Simple Schemas](./003-simple-schemas.md)
+### [003 - Simplified Schema API](./003-simplified-schema-api.md)
 
-**Status:** Accepted  
-**Data:** 2025-08-05  
-**Decisão:** Usar schemas simples e diretos em vez de schemas complexos com objetos aninhados.
+**Status:** Proposed  
+**Data:** 2025-01-27  
+**Decisão:** Simplificar a API removendo a necessidade do usuário fornecer schemas JSON, gerando-os automaticamente a partir de constraints específicas.
 
 ## Status dos ADRs
 
