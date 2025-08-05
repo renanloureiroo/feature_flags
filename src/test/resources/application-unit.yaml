@@ -1,0 +1,35 @@
+# Configuração para testes unitários (PostgreSQL via TestContainers)
+spring:
+  application:
+    name: feature-flags-api
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    show-sql: false
+
+  # Desabilitar Flyway para testes unitários
+  flyway:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

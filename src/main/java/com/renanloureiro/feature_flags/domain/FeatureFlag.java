@@ -35,6 +35,9 @@ public class FeatureFlag {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
+  @Column(name = "name", nullable = false)
+  private String name;
+
   @Column(name = "slug", nullable = false, unique = true)
   private String slug;
 
@@ -56,4 +59,35 @@ public class FeatureFlag {
   @UpdateTimestamp()
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
+
+  public static String createSlugByName(String name) {
+    if (name == null || name.trim().isEmpty()) {
+      return "";
+    }
+
+    StringBuilder slug = new StringBuilder(name.length());
+    boolean lastWasHyphen = false;
+
+    for (int i = 0; i < name.length(); i++) {
+      char c = name.charAt(i);
+
+      if (Character.isLetterOrDigit(c)) {
+        slug.append(Character.toLowerCase(c));
+        lastWasHyphen = false;
+      } else if (Character.isWhitespace(c) || c == '-' || c == '_') {
+        if (!lastWasHyphen && slug.length() > 0) {
+          slug.append('-');
+          lastWasHyphen = true;
+        }
+      }
+    }
+
+    // Remove hífen do final se existir
+    if (slug.length() > 0 && slug.charAt(slug.length() - 1) == '-') {
+      slug.setLength(slug.length() - 1);
+    }
+
+    return slug.toString();
+  }
+
 }

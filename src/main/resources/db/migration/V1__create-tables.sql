@@ -3,6 +3,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TABLE feature_flags (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     slug        TEXT NOT NULL UNIQUE,
+    name        TEXT NOT NULL,
     type        TEXT NOT NULL CHECK (type IN ('BOOLEAN','NUMBER','STRING','LIST')),
     schema      JSONB NOT NULL,
     description TEXT,

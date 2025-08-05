@@ -23,7 +23,7 @@ spring:
     show-sql: false
 
   flyway:
-    enabled: false
+    enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
 
@@ -72,21 +72,22 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
 
 server:
   port: 8080
   servlet:
-    context-path: /api/v1
+    context-path: /api
   compression:
     enabled: true
 
 springdoc:
   api-docs:
     path: /v3/api-docs
+    enabled: true
   swagger-ui:
     path: /swagger-ui.html
-    operationsSorter: alpha
-    tagsSorter: alpha
+    enabled: true

@@ -2,7 +2,7 @@
 
 Este documento explica como usar o sistema completo de observabilidade configurado para o serviço de Feature Flags.
 
-## 🎯 O que é Observabilidade?
+## O que é Observabilidade?
 
 Observabilidade é a capacidade de entender o estado interno de um sistema através de suas saídas externas. No nosso caso, usamos três pilares:
 
@@ -24,7 +24,7 @@ Observabilidade é a capacidade de entender o estado interno de um sistema atrav
 - **Exemplos**: Visualizar o caminho completo de uma requisição
 - **Ferramenta**: Jaeger + OpenTelemetry
 
-## 🚀 Como Usar
+## Como Usar
 
 ### 1. Subir a Infraestrutura
 
@@ -51,7 +51,7 @@ docker compose ps
 ./mvnw spring-boot:run
 ```
 
-## 📊 Dashboards Disponíveis
+## Dashboards Disponíveis
 
 ### Grafana - Dashboard Principal
 
@@ -86,7 +86,7 @@ jvm_memory_used_bytes{application="feature-flags-api", area="heap"}
 hikaricp_connections_active{application="feature-flags-api"}
 ```
 
-## 🔍 Tracing com Jaeger
+## Tracing com Jaeger
 
 ### Visualizando Traces
 
@@ -125,7 +125,7 @@ public void minhaOperacao() {
 }
 ```
 
-## ⚠️ Alertas Configurados
+## Alertas Configurados
 
 O Prometheus está configurado com alertas para:
 
@@ -143,7 +143,7 @@ Para receber notificações dos alertas, você pode:
 2. Integrar com Slack/Email
 3. Usar webhooks
 
-## 📈 Métricas Disponíveis
+## Métricas Disponíveis
 
 ### Métricas HTTP
 
@@ -169,7 +169,7 @@ Para receber notificações dos alertas, você pode:
 - `cache_puts_total` - Puts no cache
 - `cache_evictions_total` - Evicções do cache
 
-## 🛠️ Configuração Avançada
+## Configuração Avançada
 
 ### Adicionar Métricas Customizadas
 
@@ -229,7 +229,7 @@ public class MeuServico {
 }
 ```
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Prometheus não está coletando métricas
 
