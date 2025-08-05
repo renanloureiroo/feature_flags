@@ -7,19 +7,19 @@ Este diretório contém as decisões arquiteturais importantes do projeto Featur
 ### [001 - Feature Flag Types](./001-feature-flag-types.md)
 
 **Status:** Accepted  
-**Data:** 2025-08-05  
+**Data:** 2025-08-04  
 **Decisão:** Suportar quatro tipos principais de feature flags: BOOLEAN, NUMBER, STRING e LIST.
 
 ### [002 - Schema Validation](./002-schema-validation.md)
 
 **Status:** Accepted  
-**Data:** 2025-08-05  
+**Data:** 2025-08-04  
 **Decisão:** Implementar validação de JSON Schema usando `json-schema-validator` com schemas simples.
 
 ### [003 - Simplified Schema API](./003-simplified-schema-api.md)
 
 **Status:** Proposed  
-**Data:** 2025-01-27  
+**Data:** 2025-08-05  
 **Decisão:** Simplificar a API removendo a necessidade do usuário fornecer schemas JSON, gerando-os automaticamente a partir de constraints específicas.
 
 ## Status dos ADRs
