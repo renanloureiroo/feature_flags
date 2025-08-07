@@ -27,8 +27,16 @@ public class CreateFeatureFlagDTO {
   @Schema(description = "Tipo da feature flag", example = "BOOLEAN")
   private FeatureFlagType type;
 
-  @NotNull(message = "Schema is required")
-  @Schema(description = "Schema JSON que define a estrutura dos valores da feature flag")
+  @Schema(description = "Constraints para valores numéricos")
+  private NumberConstraints numberConstraints;
+
+  @Schema(description = "Constraints para valores de string")
+  private StringConstraints stringConstraints;
+
+  @Schema(description = "Constraints para valores de lista")
+  private ListConstraints listConstraints;
+
+  @Schema(description = "Schema JSON que define a estrutura dos valores da feature flag (DEPRECATED - use constraints específicos)", deprecated = true)
   private JsonNode schema;
 
 }

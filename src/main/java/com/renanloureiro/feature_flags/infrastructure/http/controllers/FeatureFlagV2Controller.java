@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/v1/feature-flags")
-@Tag(name = "Feature Flags", description = "Endpoints para gerenciamento de feature flags (DEPRECATED - use /v2/feature-flags)")
-public class FeatureFlagController implements FeatureFlagControllerSwagger {
+@RequestMapping("/v2/feature-flags")
+@Tag(name = "Feature Flags V2", description = "Endpoints para gerenciamento de feature flags com API simplificada")
+public class FeatureFlagV2Controller {
 
   @Autowired
   private CreateFeatureFlagUseCase createFeatureFlagUseCase;

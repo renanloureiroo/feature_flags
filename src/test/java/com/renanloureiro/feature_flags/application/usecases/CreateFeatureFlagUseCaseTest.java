@@ -15,7 +15,11 @@ import org.springframework.test.context.ContextConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.renanloureiro.feature_flags.application.dtos.CreateFeatureFlagDTO;
+import com.renanloureiro.feature_flags.application.dtos.NumberConstraints;
+import com.renanloureiro.feature_flags.application.dtos.StringConstraints;
+import com.renanloureiro.feature_flags.application.dtos.ListConstraints;
 import com.renanloureiro.feature_flags.application.repositories.FeatureFlagRepository;
+import com.renanloureiro.feature_flags.application.services.SchemaGeneratorService;
 import com.renanloureiro.feature_flags.application.validation.JsonSchemaValidationService;
 import com.renanloureiro.feature_flags.domain.FeatureFlag;
 import com.renanloureiro.feature_flags.domain.FeatureFlagType;
@@ -31,6 +35,9 @@ class CreateFeatureFlagUseCaseTest {
   @Mock
   private JsonSchemaValidationService schemaValidationService;
 
+  @Mock
+  private SchemaGeneratorService schemaGeneratorService;
+
   private CreateFeatureFlagUseCase useCase;
 
   private ObjectMapper objectMapper;
@@ -38,8 +45,7 @@ class CreateFeatureFlagUseCaseTest {
   @BeforeEach
   void setUp() {
     objectMapper = new ObjectMapper();
-    useCase = new CreateFeatureFlagUseCase();
-    // Usando reflection para injetar as dependências
+    useCase = new CreateFeatureFlagUseCase(featureFlagRepository, schemaValidationService, schemaGeneratorService);
     try {
       java.lang.reflect.Field repoField = CreateFeatureFlagUseCase.class.getDeclaredField("featureFlagRepository");
       repoField.setAccessible(true);
@@ -49,6 +55,11 @@ class CreateFeatureFlagUseCaseTest {
           .getDeclaredField("schemaValidationService");
       validationField.setAccessible(true);
       validationField.set(useCase, schemaValidationService);
+
+      java.lang.reflect.Field generatorField = CreateFeatureFlagUseCase.class
+          .getDeclaredField("schemaGeneratorService");
+      generatorField.setAccessible(true);
+      generatorField.set(useCase, schemaGeneratorService);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -135,5 +146,185 @@ class CreateFeatureFlagUseCaseTest {
     assertEquals(description, result.getDescription());
     assertEquals(type, result.getType());
     assertEquals(schema, result.getSchema());
+  }
+
+  @Test
+  @DisplayName("Deve criar feature flag BOOLEAN com constraints automáticas")
+  void shouldCreateBooleanFeatureFlagWithAutoConstraints() throws Exception {
+    // Arrange
+    String name = "Test Boolean Flag";
+    String description = "Test boolean flag description";
+    FeatureFlagType type = FeatureFlagType.BOOLEAN;
+    JsonNode expectedSchema = objectMapper.readTree("{\"type\": \"boolean\"}");
+
+    CreateFeatureFlagDTO dto = CreateFeatureFlagDTO.builder()
+        .name(name)
+        .description(description)
+        .type(type)
+        .build(); // Sem schema, deve gerar automaticamente
+
+    FeatureFlag expectedFeatureFlag = FeatureFlag.builder()
+        .name(name)
+        .slug("test-boolean-flag")
+        .description(description)
+        .type(type)
+        .schema(expectedSchema)
+        .build();
+
+    // Mock
+    when(schemaGeneratorService.generateSchema(type, null)).thenReturn(expectedSchema);
+    org.mockito.Mockito.doNothing().when(schemaValidationService).validateSchema(expectedSchema);
+    org.mockito.Mockito.doNothing().when(schemaValidationService).validateSchemaForType(expectedSchema, type.name());
+    when(featureFlagRepository.existsBySlug("test-boolean-flag")).thenReturn(false);
+    when(featureFlagRepository.save(expectedFeatureFlag)).thenReturn(expectedFeatureFlag);
+
+    // Act
+    FeatureFlag result = useCase.execute(dto);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(name, result.getName());
+    assertEquals(type, result.getType());
+    assertEquals(expectedSchema, result.getSchema());
+  }
+
+  @Test
+  @DisplayName("Deve criar feature flag NUMBER com constraints")
+  void shouldCreateNumberFeatureFlagWithConstraints() throws Exception {
+    // Arrange
+    String name = "Test Number Flag";
+    String description = "Test number flag description";
+    FeatureFlagType type = FeatureFlagType.NUMBER;
+    NumberConstraints constraints = NumberConstraints.builder()
+        .minimum(1.0)
+        .maximum(10.0)
+        .build();
+    JsonNode expectedSchema = objectMapper.readTree("{\"type\": \"number\", \"minimum\": 1.0, \"maximum\": 10.0}");
+
+    CreateFeatureFlagDTO dto = CreateFeatureFlagDTO.builder()
+        .name(name)
+        .description(description)
+        .type(type)
+        .numberConstraints(constraints)
+        .build();
+
+    FeatureFlag expectedFeatureFlag = FeatureFlag.builder()
+        .name(name)
+        .slug("test-number-flag")
+        .description(description)
+        .type(type)
+        .schema(expectedSchema)
+        .build();
+
+    // Mock
+    when(schemaGeneratorService.generateSchema(type, constraints)).thenReturn(expectedSchema);
+    org.mockito.Mockito.doNothing().when(schemaValidationService).validateSchema(expectedSchema);
+    org.mockito.Mockito.doNothing().when(schemaValidationService).validateSchemaForType(expectedSchema, type.name());
+    when(featureFlagRepository.existsBySlug("test-number-flag")).thenReturn(false);
+    when(featureFlagRepository.save(expectedFeatureFlag)).thenReturn(expectedFeatureFlag);
+
+    // Act
+    FeatureFlag result = useCase.execute(dto);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(name, result.getName());
+    assertEquals(type, result.getType());
+    assertEquals(expectedSchema, result.getSchema());
+  }
+
+  @Test
+  @DisplayName("Deve criar feature flag STRING com constraints")
+  void shouldCreateStringFeatureFlagWithConstraints() throws Exception {
+    // Arrange
+    String name = "Test String Flag";
+    String description = "Test string flag description";
+    FeatureFlagType type = FeatureFlagType.STRING;
+    StringConstraints constraints = StringConstraints.builder()
+        .enumValues(java.util.List.of("v1", "v2", "v3"))
+        .minLength(1)
+        .maxLength(10)
+        .build();
+    JsonNode expectedSchema = objectMapper
+        .readTree("{\"type\": \"string\", \"enum\": [\"v1\", \"v2\", \"v3\"], \"minLength\": 1, \"maxLength\": 10}");
+
+    CreateFeatureFlagDTO dto = CreateFeatureFlagDTO.builder()
+        .name(name)
+        .description(description)
+        .type(type)
+        .stringConstraints(constraints)
+        .build();
+
+    FeatureFlag expectedFeatureFlag = FeatureFlag.builder()
+        .name(name)
+        .slug("test-string-flag")
+        .description(description)
+        .type(type)
+        .schema(expectedSchema)
+        .build();
+
+    // Mock
+    when(schemaGeneratorService.generateSchema(type, constraints)).thenReturn(expectedSchema);
+    org.mockito.Mockito.doNothing().when(schemaValidationService).validateSchema(expectedSchema);
+    org.mockito.Mockito.doNothing().when(schemaValidationService).validateSchemaForType(expectedSchema, type.name());
+    when(featureFlagRepository.existsBySlug("test-string-flag")).thenReturn(false);
+    when(featureFlagRepository.save(expectedFeatureFlag)).thenReturn(expectedFeatureFlag);
+
+    // Act
+    FeatureFlag result = useCase.execute(dto);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(name, result.getName());
+    assertEquals(type, result.getType());
+    assertEquals(expectedSchema, result.getSchema());
+  }
+
+  @Test
+  @DisplayName("Deve criar feature flag LIST com constraints")
+  void shouldCreateListFeatureFlagWithConstraints() throws Exception {
+    // Arrange
+    String name = "Test List Flag";
+    String description = "Test list flag description";
+    FeatureFlagType type = FeatureFlagType.LIST;
+    ListConstraints constraints = ListConstraints.builder()
+        .itemType("string")
+        .minItems(1)
+        .maxItems(10)
+        .uniqueItems(true)
+        .build();
+    JsonNode expectedSchema = objectMapper.readTree(
+        "{\"type\": \"array\", \"items\": {\"type\": \"string\"}, \"minItems\": 1, \"maxItems\": 10, \"uniqueItems\": true}");
+
+    CreateFeatureFlagDTO dto = CreateFeatureFlagDTO.builder()
+        .name(name)
+        .description(description)
+        .type(type)
+        .listConstraints(constraints)
+        .build();
+
+    FeatureFlag expectedFeatureFlag = FeatureFlag.builder()
+        .name(name)
+        .slug("test-list-flag")
+        .description(description)
+        .type(type)
+        .schema(expectedSchema)
+        .build();
+
+    // Mock
+    when(schemaGeneratorService.generateSchema(type, constraints)).thenReturn(expectedSchema);
+    org.mockito.Mockito.doNothing().when(schemaValidationService).validateSchema(expectedSchema);
+    org.mockito.Mockito.doNothing().when(schemaValidationService).validateSchemaForType(expectedSchema, type.name());
+    when(featureFlagRepository.existsBySlug("test-list-flag")).thenReturn(false);
+    when(featureFlagRepository.save(expectedFeatureFlag)).thenReturn(expectedFeatureFlag);
+
+    // Act
+    FeatureFlag result = useCase.execute(dto);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(name, result.getName());
+    assertEquals(type, result.getType());
+    assertEquals(expectedSchema, result.getSchema());
   }
 }
