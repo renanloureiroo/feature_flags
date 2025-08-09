@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.renanloureiro.feature_flags.application.dtos.CreateFeatureFlagDTO;
 import com.renanloureiro.feature_flags.application.usecases.CreateFeatureFlagUseCase;
+import com.renanloureiro.feature_flags.infrastructure.http.doc.FeatureFlagV2ControllerSwagger;
 import com.renanloureiro.feature_flags.infrastructure.http.presenters.FeatureFlagPresenter;
 import com.renanloureiro.feature_flags.infrastructure.http.presenters.featureflag.FeatureFlagResponseDTO;
 
@@ -19,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/v2/feature-flags")
 @Tag(name = "Feature Flags V2", description = "Endpoints para gerenciamento de feature flags com API simplificada")
-public class FeatureFlagV2Controller {
+public class FeatureFlagV2Controller implements FeatureFlagV2ControllerSwagger {
 
   @Autowired
   private CreateFeatureFlagUseCase createFeatureFlagUseCase;

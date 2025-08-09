@@ -1,5 +1,6 @@
 package com.renanloureiro.feature_flags.infrastructure.repositories;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -12,7 +13,6 @@ import com.renanloureiro.feature_flags.domain.FeatureFlagValue;
 public class FeatureFlagValueRepositoryInMemoryImpl implements FeatureFlagValueRepository {
 
   private final Map<UUID, FeatureFlagValue> featureFlagValues = new HashMap<>();
-  private final Map<String, FeatureFlagValue> featureFlagValuesByFlagAndVersion = new HashMap<>();
 
   @Override
   public FeatureFlagValue save(FeatureFlagValue featureFlagValue) {
@@ -22,26 +22,33 @@ public class FeatureFlagValueRepositoryInMemoryImpl implements FeatureFlagValueR
 
     featureFlagValues.put(featureFlagValue.getId(), featureFlagValue);
 
-    String key = featureFlagValue.getFlag().getId() + "_" + featureFlagValue.getVersion();
-    featureFlagValuesByFlagAndVersion.put(key, featureFlagValue);
-
     return featureFlagValue;
   }
 
   @Override
   public Optional<FeatureFlagValue> findByFlagAndVersion(FeatureFlag flag, Integer version) {
-    String key = flag.getId() + "_" + version;
-    return Optional.ofNullable(featureFlagValuesByFlagAndVersion.get(key));
+    return featureFlagValues.values().stream()
+        .filter(featureFlagValue -> featureFlagValue.getFlag().getId().equals(flag.getId())
+            && featureFlagValue.getVersion().equals(version))
+        .findFirst();
   }
 
   @Override
   public boolean existsByFlagAndVersion(FeatureFlag flag, Integer version) {
-    String key = flag.getId() + "_" + version;
-    return featureFlagValuesByFlagAndVersion.containsKey(key);
+    return featureFlagValues.values().stream()
+        .anyMatch(featureFlagValue -> featureFlagValue.getFlag().getId().equals(flag.getId())
+            && featureFlagValue.getVersion().equals(version));
   }
 
   public void clear() {
     featureFlagValues.clear();
-    featureFlagValuesByFlagAndVersion.clear();
+  }
+
+  @Override
+  public Optional<Integer> findLatestVersionByFlagId(UUID flagId) {
+    return featureFlagValues.values().stream()
+        .filter(featureFlagValue -> featureFlagValue.getFlag().getId().equals(flagId))
+        .map(FeatureFlagValue::getVersion)
+        .max(Comparator.naturalOrder());
   }
 }

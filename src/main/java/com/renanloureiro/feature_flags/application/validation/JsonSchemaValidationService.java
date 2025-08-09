@@ -1,26 +1,24 @@
 package com.renanloureiro.feature_flags.application.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.renanloureiro.feature_flags.application.exceptions.ValidationException;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class JsonSchemaValidationService {
-  private final ObjectMapper objectMapper;
-  private final JsonSchemaFactory schemaFactory;
 
-  public JsonSchemaValidationService(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-    this.schemaFactory = JsonSchemaFactory.byDefault();
-  }
+  private final JsonSchemaFactory schemaFactory = JsonSchemaFactory.byDefault();
 
   /**
    * Valida se o schema JSON é válido

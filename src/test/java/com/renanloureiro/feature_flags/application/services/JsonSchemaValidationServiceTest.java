@@ -27,7 +27,7 @@ class JsonSchemaValidationServiceTest {
   @BeforeEach
   void setUp() {
     testObjectMapper = new ObjectMapper();
-    validationService = new JsonSchemaValidationService(testObjectMapper);
+    validationService = new JsonSchemaValidationService();
   }
 
   @Test

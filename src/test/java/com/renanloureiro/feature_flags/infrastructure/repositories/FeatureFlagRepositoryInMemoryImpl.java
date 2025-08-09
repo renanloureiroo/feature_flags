@@ -1,6 +1,8 @@
 package com.renanloureiro.feature_flags.infrastructure.repositories;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,7 +13,6 @@ import com.renanloureiro.feature_flags.domain.FeatureFlag;
 public class FeatureFlagRepositoryInMemoryImpl implements FeatureFlagRepository {
 
   private final Map<UUID, FeatureFlag> featureFlags = new HashMap<>();
-  private final Map<String, FeatureFlag> featureFlagsBySlug = new HashMap<>();
 
   @Override
   public FeatureFlag save(FeatureFlag featureFlag) {
@@ -20,23 +21,34 @@ public class FeatureFlagRepositoryInMemoryImpl implements FeatureFlagRepository 
     }
 
     featureFlags.put(featureFlag.getId(), featureFlag);
-    featureFlagsBySlug.put(featureFlag.getSlug(), featureFlag);
 
     return featureFlag;
   }
 
   @Override
   public Optional<FeatureFlag> findBySlug(String slug) {
-    return Optional.ofNullable(featureFlagsBySlug.get(slug));
+    return featureFlags.values().stream()
+        .filter(featureFlag -> featureFlag.getSlug().equals(slug))
+        .findFirst();
   }
 
   @Override
   public boolean existsBySlug(String slug) {
-    return featureFlagsBySlug.containsKey(slug);
+    return featureFlags.values().stream()
+        .anyMatch(featureFlag -> featureFlag.getSlug().equals(slug));
+  }
+
+  @Override
+  public List<FeatureFlag> findAll() {
+    return new ArrayList<FeatureFlag>(featureFlags.values());
   }
 
   public void clear() {
     featureFlags.clear();
-    featureFlagsBySlug.clear();
+  }
+
+  @Override
+  public Optional<FeatureFlag> findById(UUID id) {
+    return Optional.ofNullable(featureFlags.get(id));
   }
 }

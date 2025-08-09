@@ -57,7 +57,6 @@ feature-flags/
 - **[Setup do Projeto](docs/setup.md)** - Como configurar e rodar
 - **[Arquitetura](docs/architecture.md)** - Detalhes da arquitetura
 - **[API Reference](docs/api.md)** - Documentação da API
-- **[Observabilidade](docs/observability.md)** - Métricas, logs e tracing
 - **[ADRs](docs/adr/)** - Decisões arquiteturais
 
 ## 🧪 Testes

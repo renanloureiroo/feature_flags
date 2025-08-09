@@ -1,4 +1,5 @@
 services:
+  # Base de dados
   postgres:
     image: postgres:16-alpine
     container_name: ff-postgres
@@ -9,79 +10,30 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ff-network
     restart: unless-stopped
 
+  # Cache
   redis:
     image: redis:7-alpine
     container_name: ff-redis
-    command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
     volumes:
-      - redisdata:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-    restart: unless-stopped
-
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    container_name: ff-jaeger
-    ports:
-      - "16686:16686" # UI
-      - "14268:14268" # HTTP collector
-      - "14250:14250" # gRPC collector
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-    restart: unless-stopped
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: ff-prometheus
-    volumes:
-      - ./prometheus:/etc/prometheus:ro
-      - prometheusdata:/prometheus
-    ports:
-      - "9090:9090"
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.console.libraries=/etc/prometheus/console_libraries"
-      - "--web.console.templates=/etc/prometheus/consoles"
-      - "--storage.tsdb.retention.time=200h"
-      - "--web.enable-lifecycle"
-    depends_on:
-      - postgres
-      - redis
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: ff-grafana
-    ports:
-      - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
-      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
-    volumes:
-      - grafanadata:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
-    depends_on:
-      - prometheus
+      - redis_data:/data
+    networks:
+      - ff-network
     restart: unless-stopped
 
 volumes:
-  pgdata:
-  redisdata:
-  grafanadata:
-  prometheusdata:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  ff-network:
+    driver: bridge
+    name: feature-flags-network

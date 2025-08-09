@@ -11,8 +11,13 @@ import com.renanloureiro.feature_flags.application.services.SchemaGeneratorServi
 import com.renanloureiro.feature_flags.application.validation.JsonSchemaValidationService;
 import com.renanloureiro.feature_flags.domain.FeatureFlag;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 @Transactional
+@RequiredArgsConstructor
 public class CreateFeatureFlagUseCase {
 
   private final FeatureFlagRepository featureFlagRepository;
@@ -20,13 +25,6 @@ public class CreateFeatureFlagUseCase {
   private final JsonSchemaValidationService schemaValidationService;
 
   private final SchemaGeneratorService schemaGeneratorService;
-
-  public CreateFeatureFlagUseCase(FeatureFlagRepository featureFlagRepository,
-      JsonSchemaValidationService schemaValidationService, SchemaGeneratorService schemaGeneratorService) {
-    this.featureFlagRepository = featureFlagRepository;
-    this.schemaValidationService = schemaValidationService;
-    this.schemaGeneratorService = schemaGeneratorService;
-  }
 
   public FeatureFlag execute(CreateFeatureFlagDTO dto) {
 

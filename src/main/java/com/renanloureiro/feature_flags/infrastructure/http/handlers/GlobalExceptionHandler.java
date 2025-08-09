@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.renanloureiro.feature_flags.application.exceptions.AppError;
 import com.renanloureiro.feature_flags.application.exceptions.BaseException;
@@ -89,6 +91,49 @@ public class GlobalExceptionHandler {
         .build();
 
     return ResponseEntity.badRequest().body(error);
+  }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<AppError> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+    log.error("Argumento inválido: {}", ex.getMessage(), ex);
+
+    AppError error = AppError.builder()
+        .message("Argumento inválido: " + ex.getMessage())
+        .timestamp(LocalDateTime.now())
+        .status(400)
+        .build();
+
+    return ResponseEntity.badRequest().body(error);
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<AppError> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
+      WebRequest request) {
+    log.error("Erro de tipo de argumento: {}", ex.getMessage(), ex);
+
+    String message = "Argumento inválido: " + ex.getName() + " deve ser do tipo "
+        + ex.getRequiredType().getSimpleName();
+    AppError error = AppError.builder()
+        .message(message)
+        .timestamp(LocalDateTime.now())
+        .status(400)
+        .build();
+
+    return ResponseEntity.badRequest().body(error);
+  }
+
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<AppError> handleNoResourceFoundException(NoResourceFoundException ex, WebRequest request) {
+    log.error("Recurso não encontrado: {}", ex.getMessage(), ex);
+
+    String message = "Endpoint não encontrado. Verifique se a URL está correta e inclui o prefixo /api";
+    AppError error = AppError.builder()
+        .message(message)
+        .timestamp(LocalDateTime.now())
+        .status(404)
+        .build();
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
   @ExceptionHandler(Exception.class)
